@@ -17,6 +17,7 @@ The project is designed to be portfolio-ready while staying safe to run on a per
 - [Supported Sources](#supported-sources)
 - [Theme And Preferences](#theme-and-preferences)
 - [Security Checks](#security-checks)
+- [Repository Defaults](#repository-defaults)
 - [Development](#development)
 - [Documentation](#documentation)
 - [Limitations](#limitations)
@@ -129,9 +130,13 @@ python install.py --server-status
 
 ```text
 .
+├── .github/
+│   ├── dependabot.yml
+│   └── workflows/
 ├── docs/
 │   ├── assets/
 │   ├── CODEX_BUILD_PROMPT.md
+│   ├── REPOSITORY_DEFAULTS.md
 │   ├── SECURITY_AND_PRIVACY.md
 │   ├── USAGE.md
 │   └── ...
@@ -154,9 +159,12 @@ python install.py --server-status
 ├── quickstart.command
 ├── quickstart.sh
 ├── quickstart.bat
+├── CONTRIBUTING.md
+├── LICENSE
 ├── Pipfile
 ├── pyproject.toml
-└── README.md
+├── README.md
+└── SECURITY.md
 ```
 
 ## File Guide
@@ -174,6 +182,13 @@ python install.py --server-status
 | `scripts/privacy_audit.py` | Verifies generated outputs do not contain forbidden text patterns. |
 | `scripts/check_repo_security.py` | Repo-wide artifact checker for text files, shell/batch scripts, HTML/CSS/JS, structured files, PNG assets, and executable modes. |
 | `docs/CODEX_BUILD_PROMPT.md` | Sanitized copy/paste prompt for recreating or adapting the project with Codex. |
+| `docs/REPOSITORY_DEFAULTS.md` | Default files, checks, and GitHub settings to reuse for local-first portfolio repos. |
+| `.github/workflows/ci.yml` | GitHub Actions workflow for linting, tests, privacy audit, and artifact security checks. |
+| `.github/workflows/codeql.yml` | GitHub CodeQL code scanning workflow for Python and JavaScript. |
+| `.github/dependabot.yml` | Dependabot updates for GitHub Actions and Python dependency metadata. |
+| `SECURITY.md` | Vulnerability reporting policy and maintainer security checklist. |
+| `CONTRIBUTING.md` | Contributor setup, privacy rules, and pull-request checklist. |
+| `LICENSE` | MIT license for reuse. |
 | `web/index.html` | Static dashboard shell. |
 | `web/styles.css` | Responsive light/dark product styling. |
 | `web/app.js` | Browser-only rendering, charts, local preferences, help dialog, refresh, and lifecycle hooks. |
@@ -274,6 +289,21 @@ The localhost server also:
 
 This hardens the local app, but it is not a substitute for an internet-facing production security program. Do not expose the server publicly.
 
+## Repository Defaults
+
+This repo includes the default public-repo hygiene files that should be carried into similar projects:
+
+- MIT `LICENSE`
+- `SECURITY.md`
+- `CONTRIBUTING.md`
+- GitHub Actions CI
+- CodeQL code scanning
+- Dependabot configuration
+- issue and pull-request templates with privacy/security reminders
+- repo-wide artifact security checks
+
+See [docs/REPOSITORY_DEFAULTS.md](docs/REPOSITORY_DEFAULTS.md).
+
 ## Development
 
 This project has no runtime package dependencies. Development tooling is managed with Pipenv:
@@ -295,6 +325,7 @@ Then open `web/index.html` or use a local static server.
 
 - [One pager](docs/ONE_PAGER.md)
 - [Reusable Codex build prompt](docs/CODEX_BUILD_PROMPT.md)
+- [Repository defaults](docs/REPOSITORY_DEFAULTS.md)
 - [Project plan](docs/PROJECT_PLAN.md)
 - [Technical design](docs/TECHNICAL_DESIGN.md)
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md)

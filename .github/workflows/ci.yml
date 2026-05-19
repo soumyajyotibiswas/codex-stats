@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, Test, And Security Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pipenv"
+
+      - name: Install Pipenv
+        run: python -m pip install --upgrade pipenv
+
+      - name: Install Dependencies
+        run: pipenv install --dev --deploy
+
+      - name: Ruff Format Check
+        run: pipenv run ruff format --check .
+
+      - name: Ruff Lint
+        run: pipenv run ruff check .
+
+      - name: Pyright
+        run: pipenv run pyright
+
+      - name: Bandit
+        run: pipenv run bandit -r install.py scripts -c pyproject.toml
+
+      - name: Unit Tests
+        run: pipenv run python -m unittest discover -s tests
+
+      - name: Generate Sample Data
+        run: pipenv run python install.py --sample --project-names
+
+      - name: Privacy Audit
+        run: pipenv run python scripts/privacy_audit.py --forbid SYNTHETIC_PROMPT_TEXT_SHOULD_NOT_APPEAR
+
+      - name: Repository Artifact Security Check
+        run: pipenv run python scripts/check_repo_security.py
+
+      - name: JavaScript Syntax Check
+        run: node --check web/app.js
+
+      - name: Shell Syntax Check
+        run: sh -n quickstart.command quickstart.sh install.sh
+
+      - name: Git Whitespace Check
+        run: git diff --check

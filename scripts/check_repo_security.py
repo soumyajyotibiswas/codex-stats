@@ -34,11 +34,15 @@ TEXT_EXTENSIONS = {
     ".sh",
     ".toml",
     ".txt",
+    ".yaml",
+    ".yml",
 }
 TEXT_NAMES = {
     ".gitignore",
+    "LICENSE",
     "Pipfile",
     "README.md",
+    "SECURITY.md",
 }
 KNOWN_BINARY_EXTENSIONS = {
     ".png",

@@ -75,6 +75,7 @@ Deliverables:
 - docs/METRICS_GUIDE.md
 - docs/OPERATIONS.md
 - docs/DEVELOPMENT.md
+- docs/REPOSITORY_DEFAULTS.md
 - scripts/build_usage_data.py
 - scripts/serve_dashboard.py
 - scripts/schedule_dashboard.py
@@ -94,6 +95,16 @@ Deliverables:
 - quickstart.command
 - quickstart.sh
 - quickstart.bat
+- SECURITY.md
+- CONTRIBUTING.md
+- LICENSE
+- .github/workflows/ci.yml
+- .github/workflows/codeql.yml
+- .github/dependabot.yml
+- .github/pull_request_template.md
+- .github/ISSUE_TEMPLATE/bug_report.yml
+- .github/ISSUE_TEMPLATE/feature_request.yml
+- .github/ISSUE_TEMPLATE/config.yml
 - .gitignore
 
 Dashboard requirements:
@@ -213,6 +224,7 @@ Documentation requirements:
 - Metrics guide with metric-to-action diagram.
 - Usage and operations docs.
 - Development docs with all local verification commands.
+- Repository defaults doc covering security policy, license, contributing guide, CI, CodeQL, Dependabot, and all-artifact security checks.
 
 Verification:
 Run or document results for:
