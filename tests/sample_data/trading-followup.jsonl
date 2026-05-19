@@ -1,0 +1,3 @@
+{"timestamp":"2026-05-12T10:15:00Z","type":"session_meta","payload":{"id":"sample-trading-followup","cwd":"/Users/example/projects/trading-program","model":"gpt-5.5","started_at":"2026-05-12T10:15:00Z","num_turns":6}}
+{"timestamp":"2026-05-12T10:42:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":38100,"cached_input_tokens":20600,"output_tokens":7900,"total_tokens":46000}}}}
+{"timestamp":"2026-05-12T11:20:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":52400,"cached_input_tokens":31400,"output_tokens":11100,"total_tokens":63500}}}}

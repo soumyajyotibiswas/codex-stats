@@ -1,0 +1,21 @@
+# Generated local usage data can contain private metadata.
+data/generated/*
+.local/
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.coverage
+
+# Editors and OS files
+.DS_Store
+.idea/
+.vscode/
+
+# Local scratch
+.tmp/
+tmp/

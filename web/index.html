@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codex Usage Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="../data/generated/codex_usage_summary.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Local-first analytics</p>
+        <h1>Codex Usage Dashboard</h1>
+        <p class="header-copy">Turn private session metadata into practical signals for focus, reuse, and better developer habits.</p>
+      </div>
+      <div class="header-actions">
+        <button id="theme-button" class="icon-button" type="button" title="Toggle day/night theme" aria-label="Toggle day/night theme">☾</button>
+        <button id="refresh-button" class="icon-button" type="button" title="Refresh live data" aria-label="Refresh live data">↻</button>
+        <button id="help-button" class="icon-button" type="button" title="Show script help" aria-label="Show script help">?</button>
+        <span id="freshness-pill" class="status-pill">Waiting for data</span>
+      </div>
+    </header>
+
+    <main>
+      <section id="empty-state" class="empty-state" hidden>
+        <h2>No generated data found</h2>
+        <p>Run <code>python install.py --sample</code> for a demo or <code>python install.py --real</code> for local Codex metadata.</p>
+      </section>
+
+      <section class="range-panel" aria-label="Dashboard time range">
+        <div>
+          <h2>Time Range</h2>
+          <p id="range-caption">Showing the latest available activity.</p>
+        </div>
+        <div id="range-toggle" class="segmented-control" role="radiogroup" aria-label="Select dashboard time range">
+          <button type="button" data-range="7d" role="radio" aria-checked="true">7D</button>
+          <button type="button" data-range="30d" role="radio" aria-checked="false">1M</button>
+          <button type="button" data-range="180d" role="radio" aria-checked="false">6M</button>
+          <button type="button" data-range="365d" role="radio" aria-checked="false">1Y</button>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Usage totals">
+        <article class="metric-card">
+          <span>Total Tokens</span>
+          <strong id="metric-total-tokens">0</strong>
+          <small id="metric-rolling">Selected range</small>
+        </article>
+        <article class="metric-card">
+          <span>Input Tokens</span>
+          <strong id="metric-input-tokens">0</strong>
+          <small id="metric-cache">Cache ratio: 0%</small>
+        </article>
+        <article class="metric-card">
+          <span>Output Tokens</span>
+          <strong id="metric-output-tokens">0</strong>
+          <small id="metric-output-ratio">Output/input: 0</small>
+        </article>
+        <article class="metric-card">
+          <span>Sessions</span>
+          <strong id="metric-sessions">0</strong>
+          <small id="metric-turns">Turns: 0</small>
+        </article>
+      </section>
+
+      <section class="panel wide insight-panel">
+        <div class="section-heading">
+          <div>
+            <h2>What This Means</h2>
+            <p>A plain-English readout of where your Codex time and context are going.</p>
+          </div>
+        </div>
+        <div id="insight-grid" class="insight-grid"></div>
+      </section>
+
+      <section class="panel wide">
+        <div class="section-heading">
+          <div>
+            <h2>Daily Token Usage</h2>
+            <p>Token volume is a proxy for task complexity, long context, and iteration cost.</p>
+          </div>
+        </div>
+        <div id="daily-chart" class="chart" role="img" aria-label="Daily token usage chart"></div>
+      </section>
+
+      <section class="panel-grid">
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <h2>Daily Activity</h2>
+              <p>Sessions and turns show collaboration rhythm, not quality by themselves.</p>
+            </div>
+          </div>
+          <div id="activity-chart" class="chart compact" role="img" aria-label="Daily sessions and turns chart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <h2>Model Breakdown</h2>
+              <p>Shows where usage lands when model metadata is available.</p>
+            </div>
+          </div>
+          <div id="model-breakdown" class="rank-list"></div>
+        </article>
+      </section>
+
+      <section class="panel-grid">
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <h2>Project Breakdown</h2>
+              <p>Find repeated high-context work without exposing project names by default.</p>
+            </div>
+          </div>
+          <div id="project-breakdown" class="rank-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="section-heading">
+            <div>
+              <h2>Memory Reuse Signals</h2>
+              <p>ROI hints for durable memory, reusable prompts, or custom skills.</p>
+            </div>
+          </div>
+          <div id="memory-signals" class="signal-list"></div>
+        </article>
+      </section>
+
+      <section class="panel wide">
+        <div class="section-heading">
+          <div>
+            <h2>Deep Dive</h2>
+            <p>Inspect one project, model, or day without leaving the local page.</p>
+          </div>
+          <div class="control-row">
+            <label>
+              View
+              <select id="deep-dive-kind">
+                <option value="project">Project</option>
+                <option value="model">Model</option>
+                <option value="day">Day</option>
+              </select>
+            </label>
+            <label>
+              Item
+              <select id="deep-dive-value"></select>
+            </label>
+          </div>
+        </div>
+        <div id="deep-dive" class="deep-dive"></div>
+      </section>
+
+      <section class="panel wide">
+        <div class="section-heading">
+          <div>
+            <h2>Largest Sessions</h2>
+            <p>Large sessions are the best candidates for workflow cleanup and reuse.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Session</th>
+                <th>Project</th>
+                <th>Model</th>
+                <th>Total</th>
+                <th>Input</th>
+                <th>Cached</th>
+                <th>Output</th>
+                <th>Turns</th>
+              </tr>
+            </thead>
+            <tbody id="largest-sessions"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel-grid">
+        <article class="panel metric-guide">
+          <h2>Metric Guide</h2>
+          <dl>
+            <dt>Total tokens</dt>
+            <dd>Overall context handled by Codex. Spikes often mean complex work or long loops.</dd>
+            <dt>Cache ratio</dt>
+            <dd>Cached input divided by input. Higher usually means more context reuse.</dd>
+            <dt>Output/input</dt>
+            <dd>Generated output compared with context read. High means generation-heavy; low means context-heavy.</dd>
+            <dt>Memory candidates</dt>
+            <dd>Repeated high-token work that may deserve a memory note, project guide, or skill.</dd>
+          </dl>
+        </article>
+        <article class="panel status-card">
+          <h2>Operations</h2>
+          <dl id="operations-list"></dl>
+        </article>
+      </section>
+
+      <section class="panel-grid">
+        <article class="panel status-card">
+          <h2>Data Freshness</h2>
+          <dl id="freshness-list"></dl>
+        </article>
+        <article class="panel status-card">
+          <h2>Privacy Status</h2>
+          <dl id="privacy-list"></dl>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <span>Static, local, dependency-free.</span>
+    </footer>
+
+    <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+
+    <dialog id="help-dialog" class="help-dialog">
+      <form method="dialog">
+        <div class="dialog-header">
+          <h2>Dashboard Help</h2>
+          <button class="icon-button" value="close" aria-label="Close help">×</button>
+        </div>
+      </form>
+      <div id="help-content" class="help-content">
+        <p class="muted">When served locally, this button loads the script help from the local API.</p>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

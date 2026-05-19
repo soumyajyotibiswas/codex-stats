@@ -1,0 +1,5 @@
+{"timestamp":"2026-05-06T11:00:00Z","type":"session_meta","payload":{"id":"sample-trading-pipeline-debug","cwd":"/Users/example/projects/trading-program","model":"gpt-5.5","started_at":"2026-05-06T11:00:00Z","num_turns":11}}
+{"timestamp":"2026-05-06T11:06:00Z","type":"turn_context","payload":{"cwd":"/Users/example/projects/trading-program"}}
+{"timestamp":"2026-05-06T12:02:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":48200,"cached_input_tokens":18800,"output_tokens":9600,"total_tokens":57800}}}}
+{"timestamp":"2026-05-06T13:10:00Z","type":"response_item","payload":{"memory_citation":{"count":1},"info":{"total_token_usage":{"input_tokens":73100,"cached_input_tokens":30100,"output_tokens":15100,"total_tokens":88200}}}}
+{"timestamp":"2026-05-06T13:40:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":81100,"cached_input_tokens":35100,"output_tokens":17400,"total_tokens":98500}}}}

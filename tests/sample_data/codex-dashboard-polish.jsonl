@@ -1,0 +1,4 @@
+{"timestamp":"2026-05-08T15:00:00Z","type":"session_meta","payload":{"id":"sample-codex-dashboard-polish","cwd":"/Users/example/projects/codex-stats","model":"gpt-5.4","started_at":"2026-05-08T15:00:00Z","num_turns":7}}
+{"timestamp":"2026-05-08T15:18:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":29200,"cached_input_tokens":14200,"output_tokens":7200,"total_tokens":36400}}}}
+{"timestamp":"2026-05-08T16:08:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":41800,"cached_input_tokens":23600,"output_tokens":10600,"total_tokens":52400}}}}
+{"timestamp":"2026-05-08T16:21:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":45200,"cached_input_tokens":26100,"output_tokens":11800,"total_tokens":57000}}}}

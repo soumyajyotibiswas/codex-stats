@@ -1,0 +1,20 @@
+{
+  "include": [
+    "install.py",
+    "scripts",
+    "tests"
+  ],
+  "exclude": [
+    ".git",
+    ".local",
+    ".venv",
+    "__pycache__",
+    "data/generated"
+  ],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownArgumentType": false
+}

@@ -1,0 +1,4 @@
+{"timestamp":"2026-05-01T09:00:00Z","type":"session_meta","payload":{"id":"sample-alpha-refactor","cwd":"/Users/example/projects/customer-portal","model":"gpt-5.4","started_at":"2026-05-01T09:00:00Z","num_turns":5}}
+{"timestamp":"2026-05-01T09:04:00Z","type":"turn_context","payload":{"cwd":"/Users/example/projects/customer-portal"}}
+{"timestamp":"2026-05-01T09:22:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":7200,"cached_input_tokens":900,"output_tokens":1800,"total_tokens":9000}}}}
+{"timestamp":"2026-05-01T10:15:00Z","type":"response_item","payload":{"info":{"total_token_usage":{"input_tokens":9800,"cached_input_tokens":1200,"output_tokens":2600,"total_tokens":12400}}}}
