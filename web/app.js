@@ -29,6 +29,46 @@
     return fmt.format(Number(value) || 0);
   }
 
+  function compactNumber(value) {
+    const numeric = Number(value) || 0;
+    const abs = Math.abs(numeric);
+    const units = [
+      { threshold: 1_000_000_000, suffix: "B" },
+      { threshold: 1_000_000, suffix: "M" },
+      { threshold: 1_000, suffix: "K" },
+    ];
+    const unit = units.find((item) => abs >= item.threshold);
+    if (!unit) return number(numeric);
+    const scaled = numeric / unit.threshold;
+    const digits = Math.abs(scaled) >= 10 ? 0 : 1;
+    const compact = scaled.toFixed(digits).replace(/\.0$/, "");
+    return `${compact}${unit.suffix}*`;
+  }
+
+  function tokenNumber(value) {
+    return compactNumber(value);
+  }
+
+  function tokenTitle(value) {
+    return `${number(value)} exact tokens`;
+  }
+
+  function tokenCell(value) {
+    return `<span title="${escapeAttr(tokenTitle(value))}">${escapeHtml(tokenNumber(value))}</span>`;
+  }
+
+  function setTokenMetric(id, value) {
+    const el = byId(id);
+    if (!el) return;
+    el.textContent = tokenNumber(value);
+    el.title = tokenTitle(value);
+  }
+
+  function tokenText(value) {
+    const compact = tokenNumber(value);
+    return compact.endsWith("*") ? `${compact} (${number(value)} exact)` : compact;
+  }
+
   function renderEmpty() {
     byId("empty-state").hidden = false;
     setText("freshness-pill", "No generated data");
@@ -333,8 +373,9 @@
       .join(" ");
   }
 
-  function renderLineChart(targetId, rows, series, rangeOption = RANGE_OPTIONS["7d"]) {
+  function renderLineChart(targetId, rows, series, rangeOption = RANGE_OPTIONS["7d"], options = {}) {
     const target = byId(targetId);
+    const compactAxis = Boolean(options.compactAxis);
     const width = target.classList.contains("compact")
       ? Math.max(760, Math.round(rangeOption.chartWidth * 0.72))
       : rangeOption.chartWidth;
@@ -353,11 +394,11 @@
           `<g transform="translate(${pad.left + index * 150},18)"><line x1="0" y1="0" x2="18" y2="0" class="${item.className}" stroke-width="3"/><text x="26" y="4" class="axis">${item.label}</text></g>`
       )
       .join("");
-
     const grid = yTicks
       .map((tick) => {
         const y = pad.top + (1 - tick / maxValue) * (height - pad.top - pad.bottom);
-        return `<line x1="${pad.left}" x2="${width - pad.right}" y1="${y}" y2="${y}" class="grid-line"/><text x="16" y="${y + 4}" class="axis">${number(tick)}</text>`;
+        const tickLabel = compactAxis ? compactNumber(tick) : number(tick);
+        return `<line x1="${pad.left}" x2="${width - pad.right}" y1="${y}" y2="${y}" class="grid-line"/><text x="16" y="${y + 4}" class="axis">${tickLabel}</text>`;
       })
       .join("");
 
@@ -381,7 +422,8 @@
           .map((row, index) => {
             const x = pad.left + (rows.length === 1 ? 0.5 : index / (rows.length - 1)) * (width - pad.left - pad.right);
             const y = pad.top + (height - pad.top - pad.bottom) - ((Number(row[item.key]) || 0) / maxValue) * (height - pad.top - pad.bottom);
-            const tip = `${item.label}\n${row.date}: ${number(row[item.key])}\nSessions: ${number(row.sessions)}\nTurns: ${number(row.turns)}`;
+            const valueLabel = compactAxis ? `${tokenNumber(row[item.key])} (${number(row[item.key])} exact)` : number(row[item.key]);
+            const tip = `${item.label}\n${row.date}: ${valueLabel}\nSessions: ${number(row.sessions)}\nTurns: ${number(row.turns)}`;
             return `<circle class="hit-point ${item.className}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" data-tip="${escapeAttr(tip)}"><title>${escapeHtml(tip)}</title></circle>`;
           })
           .join("")
@@ -403,7 +445,7 @@
       .map((row) => {
         const width = Math.round(((Number(row.total_tokens) || 0) / max) * 100);
         return `<div class="rank-item">
-          <div class="rank-topline"><strong>${escapeHtml(row[keyName] || "Unknown")}</strong><span>${number(row.total_tokens)}</span></div>
+          <div class="rank-topline"><strong>${escapeHtml(row[keyName] || "Unknown")}</strong><span title="${escapeAttr(tokenTitle(row.total_tokens))}">${escapeHtml(tokenNumber(row.total_tokens))}</span></div>
           <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
           <div class="muted">${number(row.sessions)} sessions, ${number(row.turns)} turns, cache ${pct(row.cache_ratio)}</div>
         </div>`;
@@ -423,7 +465,7 @@
     candidates.slice(0, 3).forEach((item) => {
       items.push({
         title: `${item.project} candidate`,
-        text: `${number(item.total_tokens)} tokens across ${number(item.sessions)} sessions.`,
+        text: `${tokenText(item.total_tokens)} tokens across ${number(item.sessions)} sessions.`,
       });
     });
     if (items.length === 1 && citations.length === 0) {
@@ -456,17 +498,17 @@
       },
       {
         title: peakDay.date ? `Peak day: ${peakDay.date}` : "No peak day yet",
-        text: peakDay.date ? `${number(peakDay.total_tokens)} tokens across ${number(peakDay.sessions)} sessions.` : "Generate real data to identify your heaviest day.",
+        text: peakDay.date ? `${tokenText(peakDay.total_tokens)} tokens across ${number(peakDay.sessions)} sessions.` : "Generate real data to identify your heaviest day.",
       },
       {
         title: `${number(insights.memory_candidate_count)} reuse candidates`,
-        text: topProject.project ? `Top project label: ${topProject.project} with ${number(topProject.total_tokens)} tokens.` : "Repeated high-token work will appear here.",
+        text: topProject.project ? `Top project label: ${topProject.project} with ${tokenText(topProject.total_tokens)} tokens.` : "Repeated high-token work will appear here.",
       },
     ];
     if (latestDay.date && latestDay.date !== peakDay.date) {
       items.push({
         title: `Latest active day: ${latestDay.date}`,
-        text: `${number(latestDay.total_tokens)} tokens and ${number(latestDay.turns)} turns.`,
+        text: `${tokenText(latestDay.total_tokens)} tokens and ${number(latestDay.turns)} turns.`,
       });
     }
     byId("insight-grid").innerHTML = items
@@ -485,10 +527,10 @@
           <td>${escapeHtml(row.session_id)}</td>
           <td>${escapeHtml(row.project)}</td>
           <td>${escapeHtml(row.model)}</td>
-          <td>${number(row.total_tokens)}</td>
-          <td>${number(row.input_tokens)}</td>
-          <td>${number(row.cached_input_tokens)}</td>
-          <td>${number(row.output_tokens)}</td>
+          <td>${tokenCell(row.total_tokens)}</td>
+          <td>${tokenCell(row.input_tokens)}</td>
+          <td>${tokenCell(row.cached_input_tokens)}</td>
+          <td>${tokenCell(row.output_tokens)}</td>
           <td>${number(row.turn_count)}</td>
         </tr>`
       )
@@ -595,10 +637,10 @@
       const row = sources[kind].find((item) => String(item[label]) === selected) || sources[kind][0] || {};
       savePrefs({ deepDiveKind: kind, deepDiveValue: selected });
       const cards = [
-        ["Total tokens", number(row.total_tokens)],
-        ["Input tokens", number(row.input_tokens)],
-        ["Cached input", number(row.cached_input_tokens)],
-        ["Output tokens", number(row.output_tokens)],
+        ["Total tokens", tokenText(row.total_tokens)],
+        ["Input tokens", tokenText(row.input_tokens)],
+        ["Cached input", tokenText(row.cached_input_tokens)],
+        ["Output tokens", tokenText(row.output_tokens)],
         [kind === "day" ? "Usage events" : "Sessions", number(kind === "day" ? row.usage_events : row.sessions)],
         ["Turns", number(row.turns)],
         ["Cache ratio", pct(row.cache_ratio)],
@@ -655,11 +697,11 @@
     const rangeOption = scoped.range.option;
     setText("freshness-pill", `Last parsed ${summary.freshness?.last_parsed_timestamp || "unknown"}`);
     setText("range-caption", rangeCaption(scoped));
-    setText("metric-total-tokens", number(totals.total_tokens));
-    setText("metric-rolling", `Selected ${rangeOption.shortLabel}: ${number(totals.total_tokens)}`);
-    setText("metric-input-tokens", number(totals.input_tokens));
+    setTokenMetric("metric-total-tokens", totals.total_tokens);
+    setText("metric-rolling", `Selected ${rangeOption.shortLabel}: ${tokenText(totals.total_tokens)}`);
+    setTokenMetric("metric-input-tokens", totals.input_tokens);
     setText("metric-cache", `Cache ratio: ${pct(totals.cache_ratio)}`);
-    setText("metric-output-tokens", number(totals.output_tokens));
+    setTokenMetric("metric-output-tokens", totals.output_tokens);
     setText("metric-output-ratio", `Output/input: ${(Number(totals.output_input_ratio) || 0).toFixed(2)}`);
     setText("metric-sessions", number(totals.sessions));
     setText("metric-turns", `Turns: ${number(totals.turns)}`);
@@ -669,7 +711,7 @@
       { key: "input_tokens", label: "Input", className: "series-input" },
       { key: "cached_input_tokens", label: "Cached", className: "series-cached" },
       { key: "output_tokens", label: "Output", className: "series-output" },
-    ], rangeOption);
+    ], rangeOption, { compactAxis: true });
     renderLineChart("activity-chart", daily, [
       { key: "sessions", label: "Sessions", className: "series-total" },
       { key: "turns", label: "Turns", className: "series-input" },

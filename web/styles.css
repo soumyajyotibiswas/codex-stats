@@ -280,6 +280,12 @@ footer {
   min-height: 260px;
 }
 
+.chart-scale-note {
+  margin: 8px 2px 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .chart svg {
   display: block;
   width: 100%;

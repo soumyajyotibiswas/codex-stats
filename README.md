@@ -182,6 +182,7 @@ python install.py --server-status
 | `scripts/privacy_audit.py` | Verifies generated outputs do not contain forbidden text patterns. |
 | `scripts/check_repo_security.py` | Repo-wide artifact checker for text files, shell/batch scripts, HTML/CSS/JS, structured files, PNG assets, and executable modes. |
 | `docs/CODEX_BUILD_PROMPT.md` | Sanitized copy/paste prompt for recreating or adapting the project with Codex. |
+| `docs/HASHNODE_CODEX_STATS_DRAFT.md` | Draft portfolio write-up for publishing the project story with synthetic screenshots only. |
 | `docs/REPOSITORY_DEFAULTS.md` | Default files, checks, and GitHub settings to reuse for local-first portfolio repos. |
 | `.github/workflows/ci.yml` | GitHub Actions workflow for linting, tests, privacy audit, and artifact security checks. |
 | `.github/dependabot.yml` | Dependabot updates for GitHub Actions and Python dependency metadata. |
@@ -324,6 +325,7 @@ Then open `web/index.html` or use a local static server.
 
 - [One pager](docs/ONE_PAGER.md)
 - [Reusable Codex build prompt](docs/CODEX_BUILD_PROMPT.md)
+- [Hashnode draft](docs/HASHNODE_CODEX_STATS_DRAFT.md)
 - [Repository defaults](docs/REPOSITORY_DEFAULTS.md)
 - [Project plan](docs/PROJECT_PLAN.md)
 - [Technical design](docs/TECHNICAL_DESIGN.md)
