@@ -184,7 +184,6 @@ python install.py --server-status
 | `docs/CODEX_BUILD_PROMPT.md` | Sanitized copy/paste prompt for recreating or adapting the project with Codex. |
 | `docs/REPOSITORY_DEFAULTS.md` | Default files, checks, and GitHub settings to reuse for local-first portfolio repos. |
 | `.github/workflows/ci.yml` | GitHub Actions workflow for linting, tests, privacy audit, and artifact security checks. |
-| `.github/workflows/codeql.yml` | GitHub CodeQL code scanning workflow for Python and JavaScript. |
 | `.github/dependabot.yml` | Dependabot updates for GitHub Actions and Python dependency metadata. |
 | `SECURITY.md` | Vulnerability reporting policy and maintainer security checklist. |
 | `CONTRIBUTING.md` | Contributor setup, privacy rules, and pull-request checklist. |
@@ -297,7 +296,7 @@ This repo includes the default public-repo hygiene files that should be carried 
 - `SECURITY.md`
 - `CONTRIBUTING.md`
 - GitHub Actions CI
-- CodeQL code scanning
+- CodeQL code scanning through GitHub default setup
 - Dependabot configuration
 - issue and pull-request templates with privacy/security reminders
 - repo-wide artifact security checks

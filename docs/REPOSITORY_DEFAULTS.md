@@ -10,7 +10,6 @@ Use these defaults for local-first portfolio projects unless a repo has a good r
 - `CONTRIBUTING.md`
 - `.gitignore`
 - `.github/workflows/ci.yml`
-- `.github/workflows/codeql.yml`
 - `.github/dependabot.yml`
 - `.github/pull_request_template.md`
 - `.github/ISSUE_TEMPLATE/`
@@ -27,7 +26,7 @@ Use these defaults for local-first portfolio projects unless a repo has a good r
 ## GitHub Defaults
 
 - Enable CI for linting, tests, privacy audit, and artifact security checks.
-- Enable CodeQL code scanning for supported languages.
+- Enable CodeQL code scanning for supported languages. Prefer GitHub default setup when available; use a custom CodeQL workflow only when default setup is not enabled.
 - Enable Dependabot for GitHub Actions and Python dependency metadata.
 - Use private vulnerability reporting when available.
 - Add issue and pull-request templates that remind contributors not to include secrets, logs, real generated data, or conversation content.

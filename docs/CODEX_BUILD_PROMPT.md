@@ -99,7 +99,6 @@ Deliverables:
 - CONTRIBUTING.md
 - LICENSE
 - .github/workflows/ci.yml
-- .github/workflows/codeql.yml
 - .github/dependabot.yml
 - .github/pull_request_template.md
 - .github/ISSUE_TEMPLATE/bug_report.yml
@@ -224,7 +223,7 @@ Documentation requirements:
 - Metrics guide with metric-to-action diagram.
 - Usage and operations docs.
 - Development docs with all local verification commands.
-- Repository defaults doc covering security policy, license, contributing guide, CI, CodeQL, Dependabot, and all-artifact security checks.
+- Repository defaults doc covering security policy, license, contributing guide, CI, CodeQL default setup, Dependabot, and all-artifact security checks.
 
 Verification:
 Run or document results for:

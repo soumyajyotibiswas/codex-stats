@@ -27,9 +27,9 @@ sh -n quickstart.command quickstart.sh install.sh
 git diff --check
 ```
 
-`scripts/check_repo_security.py` is the all-artifacts guardrail. It checks more than Python: Markdown, shell wrappers, batch files, HTML, CSS, JavaScript, JSON/JSONL/TOML/lock files, PNG screenshot assets, and expected executable modes.
+`scripts/check_repo_security.py` is the all-artifacts guardrail. It checks more than Python: Markdown, shell wrappers, batch files, HTML, CSS, JavaScript, JSON/JSONL/TOML/lock files, YAML workflow files, PNG screenshot assets, and expected executable modes.
 
-GitHub also runs these checks through `.github/workflows/ci.yml`, and CodeQL scanning is configured in `.github/workflows/codeql.yml`.
+GitHub also runs these checks through `.github/workflows/ci.yml`. CodeQL code scanning should be enabled through GitHub default setup when available; do not add a custom CodeQL workflow while default setup is enabled.
 
 ## Sample screenshots
 
