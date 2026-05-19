@@ -7,6 +7,7 @@ import json
 import re
 import stat
 import tomllib
+from dataclasses import dataclass
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -86,21 +87,32 @@ CSS_FORBIDDEN = (
 )
 
 
+@dataclass(frozen=True)
+class SecurityIssue:
+    path: Path | None
+    code: str
+
+    def render(self) -> str:
+        if self.path is None:
+            return self.code
+        return f"{self.path.as_posix()}: {self.code}"
+
+
 class HtmlRuntimeReferenceParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.issues: list[str] = []
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    def handle_starttag(self, _tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr_map = {name.lower(): value or "" for name, value in attrs}
         for name, value in attr_map.items():
             lowered = value.lower()
             if name.startswith("on"):
-                self.issues.append(f"inline event handler {name}")
+                self.issues.append("inline event handler")
             if lowered.startswith("javascript:"):
-                self.issues.append(f"javascript URL in {name}")
+                self.issues.append("javascript URL")
             if name in {"src", "href", "action"} and lowered.startswith(("http://", "https://", "//")):
-                self.issues.append(f"remote runtime reference {tag}[{name}]={value}")
+                self.issues.append("remote runtime reference")
 
 
 def iter_repo_files() -> list[Path]:
@@ -127,54 +139,54 @@ def is_known_binary_artifact(path: Path) -> bool:
     return path.suffix in KNOWN_BINARY_EXTENSIONS and "assets" in path.parts
 
 
-def check_known_binary(path: Path, issues: list[str]) -> None:
+def check_known_binary(path: Path, issues: list[SecurityIssue]) -> None:
     if path.suffix == ".png" and not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
-        issues.append(f"{path.relative_to(ROOT)}: invalid PNG header")
+        issues.append(SecurityIssue(path.relative_to(ROOT), "invalid PNG header"))
 
 
-def check_secret_patterns(path: Path, text: str, issues: list[str]) -> None:
+def check_secret_patterns(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     if LOCAL_USER_PATH_MARKER in text:
-        issues.append(f"{path}: contains absolute local user path")
+        issues.append(SecurityIssue(path, "contains absolute local user path"))
     for name, pattern in SECRET_PATTERNS.items():
         if pattern.search(text):
-            issues.append(f"{path}: possible secret pattern: {name}")
+            issues.append(SecurityIssue(path, f"possible secret pattern: {name}"))
 
 
-def check_html(path: Path, text: str, issues: list[str]) -> None:
+def check_html(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     parser = HtmlRuntimeReferenceParser()
     parser.feed(text)
     for issue in parser.issues:
-        issues.append(f"{path}: {issue}")
+        issues.append(SecurityIssue(path, issue))
 
 
-def check_css(path: Path, text: str, issues: list[str]) -> None:
+def check_css(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     lowered = text.lower()
     for pattern in CSS_FORBIDDEN:
         if pattern in lowered:
-            issues.append(f"{path}: forbidden CSS pattern: {pattern}")
+            issues.append(SecurityIssue(path, f"forbidden CSS pattern: {pattern}"))
 
 
-def check_js(path: Path, text: str, issues: list[str]) -> None:
+def check_js(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     for pattern in JS_FORBIDDEN:
         if pattern in text:
-            issues.append(f"{path}: forbidden JS pattern: {pattern}")
+            issues.append(SecurityIssue(path, f"forbidden JS pattern: {pattern}"))
 
 
-def check_shell(path: Path, text: str, issues: list[str]) -> None:
+def check_shell(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     lowered = text.lower()
     for pattern in SHELL_FORBIDDEN:
         if pattern in lowered:
-            issues.append(f"{path}: forbidden shell pattern: {pattern}")
+            issues.append(SecurityIssue(path, f"forbidden shell pattern: {pattern}"))
 
 
-def check_batch(path: Path, text: str, issues: list[str]) -> None:
+def check_batch(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     lowered = text.lower()
     for pattern in BATCH_FORBIDDEN:
         if pattern in lowered:
-            issues.append(f"{path}: forbidden batch pattern: {pattern}")
+            issues.append(SecurityIssue(path, f"forbidden batch pattern: {pattern}"))
 
 
-def check_structured(path: Path, text: str, issues: list[str]) -> None:
+def check_structured(path: Path, text: str, issues: list[SecurityIssue]) -> None:
     try:
         if path.suffix == ".json" or path.name == "Pipfile.lock":
             json.loads(text)
@@ -184,11 +196,11 @@ def check_structured(path: Path, text: str, issues: list[str]) -> None:
                     json.loads(line)
         elif path.suffix == ".toml" or path.name == "Pipfile":
             tomllib.loads(text)
-    except (json.JSONDecodeError, tomllib.TOMLDecodeError) as exc:
-        issues.append(f"{path}: invalid structured file: {exc}")
+    except (json.JSONDecodeError, tomllib.TOMLDecodeError):
+        issues.append(SecurityIssue(path, "invalid structured file"))
 
 
-def check_executable_modes(issues: list[str]) -> None:
+def check_executable_modes(issues: list[SecurityIssue]) -> None:
     expected = [
         "install.py",
         "install.sh",
@@ -203,20 +215,20 @@ def check_executable_modes(issues: list[str]) -> None:
     for relative in expected:
         path = ROOT / relative
         if not path.exists():
-            issues.append(f"{path}: expected executable file is missing")
+            issues.append(SecurityIssue(Path(relative), "expected executable file is missing"))
             continue
         if not (path.stat().st_mode & stat.S_IXUSR):
-            issues.append(f"{path}: expected executable bit for owner")
+            issues.append(SecurityIssue(Path(relative), "expected executable bit for owner"))
 
 
 def main() -> int:
-    issues: list[str] = []
+    issues: list[SecurityIssue] = []
     for path in iter_repo_files():
         if not is_text_artifact(path):
             if is_known_binary_artifact(path):
                 check_known_binary(path, issues)
                 continue
-            issues.append(f"{path}: unexpected binary or unknown file type")
+            issues.append(SecurityIssue(path.relative_to(ROOT), "unexpected binary or unknown file type"))
             continue
         text = read_text(path)
         relative = path.relative_to(ROOT)
@@ -236,7 +248,7 @@ def main() -> int:
     if issues:
         print("Repository security check failed:")
         for issue in issues:
-            print(f"  - {issue}")
+            print(f"  - {issue.render()}")
         return 1
     print("Repository security check passed")
     return 0
